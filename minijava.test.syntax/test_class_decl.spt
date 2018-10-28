@@ -1,0 +1,21 @@
+module example
+
+language minijava
+
+start symbol ClassDecl
+
+test simple class			[[
+class foo 
+{ 
+	int a; 
+	String b; 
+	public int get_int (int index) 
+	{
+		return a;
+	}
+}]] parse succeeds
+test class mixed up			[[class foo { int a; public int get_int (int index) {return a;} String b;}]] parse fails
+test empty class			[[class foo {}]] parse succeeds
+test abstract class			[[abstract class foo {}]] parse fails
+test extends				[[class foo extends bar {}]] parse succeeds
+test no var modifiers		[[class foo { public int a; private String b; public int get_int (int index) {return a;}}]] parse fails

@@ -1,0 +1,13 @@
+module example
+
+language minijava
+
+start symbol Statement
+
+test single line comment 		[[var = 4; //test]] parse succeeds
+test single line comment inside	[[var = // 4;]] parse fails
+test block comment 				[[var = 2; /*comment*/ ]] parse succeeds
+test block comment inside		[[var = /*comment*/ 2;]] parse succeeds
+test empty block comment 		[[var = 3;/**/]] parse succeeds
+test nested block comment 		[[var = 3;/* level 1 /* level 2 */ level 1 */]] parse fails
+test nested block correct 		[[var = 3;/* level 1 /* level 2 */]] parse succeeds

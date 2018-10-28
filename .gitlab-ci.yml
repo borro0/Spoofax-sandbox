@@ -1,0 +1,27 @@
+stages:
+- build
+- grade
+
+build:
+  image: maven:latest
+  stage: build
+  only:
+    - /^assignment-.*-develop$/
+  script:
+    - mvn verify
+  cache:
+    paths:
+      - .m2/
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=.m2"
+
+grade:
+  image: gitlab.ewi.tudelft.nl:4242/cs4200-b/admin/docker-grader:latest
+  stage: grade
+  tags:
+    - longJob
+  only:
+    - /^assignment-.*-submission$/
+    - /^assignment-.*-grade$/
+  script:
+    - /grading/run $CI_COMMIT_REF_NAME $CI_PROJECT_DIR

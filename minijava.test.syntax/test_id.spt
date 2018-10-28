@@ -1,0 +1,74 @@
+module example
+
+language minijava
+
+start symbol ID
+
+test single char				[[x]] parse succeeds
+test single captital			[[X]] parse succeeds
+test single num					[[1]] parse fails
+
+test only chars 				[[foo]] parse succeeds
+test with capitals				[[HelloWorld]] parse succeeds
+test with underscore			[[foo_bar]] parse succeeds
+test chars with num				[[foo1]] parse succeeds
+test with num and underscore	[[foo_bar_1]] parse succeeds
+test num at start				[[1foo]] parse fails
+test underscore at start		[[_foo]] parse fails
+test dollar at start			[[$foo]] parse fails
+test space						[[foo bar]] parse fails
+
+// Reserved keywords
+test abstract					[[abstract]] parse fails
+test assert						[[assert]] parse fails
+test boolean					[[boolean]] parse fails
+test break						[[break]] parse fails
+test byte						[[byte]] parse fails
+test case						[[case]] parse fails
+test catch						[[catch]] parse fails
+test char						[[char]] parse fails
+test class						[[class]] parse fails
+test const						[[const]] parse fails
+test continue					[[continue]] parse fails
+test default					[[default]] parse fails
+test do							[[do]] parse fails
+test double						[[double]] parse fails
+test else						[[else]] parse fails
+test enum						[[enum]] parse fails
+test extends					[[extends]] parse fails
+test final						[[final]] parse fails
+test finally					[[finally]] parse fails
+test float						[[float]] parse fails 
+test for						[[for]] parse fails 
+test goto						[[goto]] parse fails 
+test if 						[[if]] parse fails 
+test implements					[[implements]] parse fails 
+test import						[[import]] parse fails 
+test instanceof 				[[instanceof]] parse fails 
+test int 						[[int]] parse fails
+test interface					[[interface]] parse fails 
+test long 						[[long]] parse fails 
+test native						[[native]] parse fails 
+test new						[[new]] parse fails 
+test package					[[package]] parse fails
+test private					[[private]] parse fails 
+test protected 					[[protected]]parse fails 
+test public						[[public]] parse fails 
+test return						[[return]] parse fails 
+test short 						[[short]] parse fails
+test static 					[[static]] parse fails
+test strictfp 					[[strictfp]] parse fails
+test super  					[[super]] parse fails
+test switch 					[[switch]] parse fails
+test synchronized 				[[synchronized]] parse fails
+test this 						[[this]] parse fails
+test throw  					[[throw]] parse fails
+test throws 					[[throws]] parse fails
+test transient 					[[transient]] parse fails
+test try 						[[try]] parse fails
+test void  						[[void]] parse fails
+test volatile 					[[volatile]] parse fails
+test while 						[[while]] parse fails
+test true 						[[true]] parse fails
+test false  					[[false]] parse fails
+test null						[[null]] parse fails

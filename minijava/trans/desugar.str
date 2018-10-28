@@ -1,0 +1,31 @@
+module desugar
+
+imports
+
+  src-gen/signatures/common-sig
+  src-gen/signatures/minijava-sig
+  libspoofax/editor/outline
+  libspoofax/term/origin
+  pp
+
+rules
+
+	desugar:
+		Fun([s1 ,s2 | s3], body) -> Fun([s1], body')
+		where
+			body' := Fun([s2 | s3], body)
+
+	desugar:
+		App(Fun([s1], body), [e1 ,e2 | e3]) -> App(App(Fun([s1], body),[e1]), [e2 | e3])  
+
+	desugar:
+		App(Fun([s1], body), [Var(s2)]) -> body'
+		where
+			body' := <topdown(param-subt)> body;
+		rules (
+		  param-subt: Var(s1) -> Var(s2)
+		)
+	
+strategies
+
+  desugar-all = innermost(debug; desugar)

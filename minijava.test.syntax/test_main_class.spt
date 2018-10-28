@@ -1,0 +1,82 @@
+module example
+
+language minijava
+
+start symbol MainClass
+
+test main class		[[
+class foo 
+{ 
+	public static void main ( String [] text ) 
+	{
+		System.out.println(1);
+	}
+}
+]] parse succeeds
+
+test main class	more advanced [[
+class foo 
+{ 
+	public static void main ( String [] text ) 
+	{
+		if (true ) 
+		{
+			System.out.println(1);
+		}
+		else
+		{
+			variable = 3;
+		}
+	}
+}
+]] parse succeeds
+
+test main class multiple methods [[
+class foo 
+{ 
+	public static void main ( String [] text ) 
+	{
+		System.out.println(1);
+	}
+	
+	public do_something (int a)
+	{
+		int b;
+		b = a;
+		return b;
+	}
+}
+]] parse fails
+
+test main class with return [[
+class foo 
+{ 
+	public static void main ( String [] text ) 
+	{
+		System.out.println(1);
+		return;
+	}
+}
+]] parse fails
+
+test main class with var decl [[
+class foo 
+{ 
+	public static void main ( String [] text ) 
+	{
+		int a;
+		System.out.println(1);
+	}
+}
+]] parse fails
+
+test main class no main [[
+class foo { 
+	public int bar ( int text ) 
+	{
+		int a;
+		System.out.println(1);
+		return a;
+	}
+}
+]] parse fails

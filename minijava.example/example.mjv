@@ -1,0 +1,1 @@
+App(Fun(["x"], Var("x")), [Var("a")])

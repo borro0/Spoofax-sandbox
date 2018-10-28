@@ -1,0 +1,11 @@
+module Main
+
+imports
+
+  Syntax
+
+language
+
+  extensions : mjv
+
+  provider : target/metaborg/stratego.ctree

@@ -1,0 +1,20 @@
+module minijava
+
+imports
+  
+  common
+
+lexical start-symbols
+
+  STRING
+
+context-free start-symbols
+  
+  Program Exp
+
+context-free syntax
+  
+  Program.Program = <<Exp+>>
+  Exp.Var = <Var(<STRING>)> //Var : String -> E
+  Exp.Fun = <Fun([ <{STRING ","}*>], <Exp>)> // Fun : List(String) * E -> E
+  Exp.App = <App(<Exp>, [<{Exp ","}+>]) > //App : E * List(E) -> E

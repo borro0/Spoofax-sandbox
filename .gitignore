@@ -1,0 +1,11 @@
+*.aterm
+*.class
+*.jar
+
+/bin
+/src-gen
+/target
+
+/.classpath
+/.project
+/.settings
