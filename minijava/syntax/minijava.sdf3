@@ -4,6 +4,11 @@ imports
   
   common
 
+lexical syntax
+
+	StrChar = ~[\"\\\[\]]*
+  String = "\"" StrChar "\""
+  
 context-free start-symbols
   
   Program RE
@@ -12,8 +17,8 @@ context-free syntax
   
   Program.Program = <<RE+>>
   // RE.Wld =
-  RE.Str = STRING
-  RE.CC = <[<STRING>]>
+  // RE.Str = STRING
+  RE.CC = <[<String>]>
   // RE.EOL
   RE.Seq = <<RE><RE>>
   RE.Alt = <<RE>|<RE>>
