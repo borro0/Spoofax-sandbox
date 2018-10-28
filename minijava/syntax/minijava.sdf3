@@ -6,22 +6,21 @@ imports
 
 lexical syntax
 
-	StrChar = ~[\"\\\[\]]*
-  String = "\"" StrChar "\""
+	CC = ([a-zA-Z0-9]+ [\-]? [a-zA-Z0-9]+)+
   
 context-free start-symbols
   
-  Program RE
+  Program RE CC
 
 context-free syntax
   
   Program.Program = <<RE+>>
   // RE.Wld =
-  // RE.Str = STRING
-  RE.CC = <[<String>]>
-  // RE.EOL
+  RE.Str = STRING
+  RE.CC = <[<CC>]>
+  // RE.EOL = NewLineEOF
   RE.Seq = <<RE><RE>>
   RE.Alt = <<RE>|<RE>>
   RE.Plus = <<RE>+>
   RE.Star = <<RE>*>
-  RE.Opt = <<RE>?>
+  RE.Opt = RE"?"
