@@ -6,7 +6,8 @@ imports
 
 lexical syntax
 
-	CC = ([a-zA-Z0-9]+ [\-]? [a-zA-Z0-9]+)+
+	CC = [\[] [a-zA-Z0-9]+ ([\-] [a-zA-Z0-9]+)* [\]]
+	CC = [\[\.\]]
   
 context-free start-symbols
   
@@ -17,7 +18,7 @@ context-free syntax
   Program.Program = <<RE+>>
   // RE.Wld =
   RE.Str = STRING
-  RE.CC = <[<CC>]>
+  RE.CC = CC
   // RE.EOL = NewLineEOF
   RE.Seq = <<RE><RE>>
   RE.Alt = <<RE>|<RE>>
