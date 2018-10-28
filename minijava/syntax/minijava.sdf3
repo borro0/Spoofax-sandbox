@@ -6,8 +6,8 @@ imports
 
 lexical syntax
 
-	CC = [\[] [a-zA-Z0-9]+ ([\-] [a-zA-Z0-9]+)* [\]]
-	CC = [\[\.\]]
+	CC = [\[][a-zA-Z0-9]+ ([\-] [a-zA-Z0-9]+)*[\]]
+	CC = [\[][\.][\]]
   
 context-free start-symbols
   
