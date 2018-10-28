@@ -6,15 +6,34 @@ imports
 
 lexical start-symbols
 
-  STRING
+  String Number
+  
+lexical syntax
+
+  String = "\"" StrChar "\""
+
+  StrChar = ~[\"\\]*
+  StrChar = "\\" [\"\\\/bfnrt]
+  StrChar = "\\u" [0-9A-F] [0-9A-F]
+	                [0-9A-F] [0-9A-F]
+
+  Number = "-"? ("0" | [1-9][0-9]*)
+	         ("." [0-9]*)?
+					 ([eE] [\+\-]? [0-9]+)?
 
 context-free start-symbols
   
-  Program Exp
+  Program Value
 
 context-free syntax
   
-  Program.Program = <<Exp+>>
-  Exp.Var = <Var(<STRING>)> //Var : String -> E
-  Exp.Fun = <Fun([ <{STRING ","}*>], <Exp>)> // Fun : List(String) * E -> E
-  Exp.App = <App(<Exp>, [<{Exp ","}+>]) > //App : E * List(E) -> E
+  Program.Program = <<Value+>>
+  Value.String = String
+  Value.Number = Number
+  Value.Object = "{" {NameValue ","}* "}"
+  Value.Array  = "[" {Value ","}* "]"
+  Value.True   = "true"
+  Value.False  = "false"
+  Value.null   = "null"
+
+  NameValue.NV = String ":" Value
