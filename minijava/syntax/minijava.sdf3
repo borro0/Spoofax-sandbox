@@ -11,5 +11,12 @@ context-free start-symbols
 context-free syntax
   
   Program.Program = <<RE+>>
+  // RE.Wld =
   RE.Str = STRING
-  RE.Plus = <<RE>*>
+  RE.CC = <[<STRING>]>
+  // RE.EOL
+  RE.Seq = <<RE><RE>>
+  RE.Alt = <<RE>|<RE>>
+  RE.Plus = <<RE>+>
+  RE.Star = <<RE>*>
+  RE.Opt = <<RE>?>
