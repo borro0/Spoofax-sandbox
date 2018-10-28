@@ -24,4 +24,4 @@ context-free syntax
   RE.Alt = <<RE>|<RE>>
   RE.Plus = <<RE>+>
   RE.Star = <<RE>*>
-  RE.Opt = RE"?"
+  RE.Opt = <<RE>?>
