@@ -1,1 +1,1 @@
-In this repository I tried to build spoofax projects corresponding to the homework assignments. Stored in different branches.
+In this repository I tried to build spoofax projects corresponding to the homework assignments. Stored in different branches. Note that you should first remove your old spoofax project from the eclipse workspace, because it will cause naming conflicts.
