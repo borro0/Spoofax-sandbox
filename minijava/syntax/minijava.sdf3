@@ -6,22 +6,25 @@ imports
 
 lexical syntax
 
-	CC = [\[] [a-zA-Z0-9]+ ([\-] [a-zA-Z0-9]+)* [\]]
-	CC = [\[\.\]]
-  
+ 	Tag = [a-zA-Z][a-zA-Z0-9]*
+ 	Word = ~[\<\>]+
+ 	
+lexical restrictions
+	Word -/- ~[\<\>]
+ 
 context-free start-symbols
   
-  Program RE CC
+  Program Elem
 
 context-free syntax
   
-  Program.Program = <<RE+>>
-  // RE.Wld =
-  RE.Str = STRING
-  RE.CC = CC
-  // RE.EOL = NewLineEOF
-  RE.Seq = <<RE><RE>>
-  RE.Alt = <<RE>|<RE>>
-  RE.Plus = <<RE>+>
-  RE.Star = <<RE>*>
-  RE.Opt = <<RE>?>
+  Program.Program = Elem
+  
+	Elem.Node = 
+	[
+ 		<[Tag]>
+ 			[Elem*]
+ 		</[Tag]>
+ 	]	
+
+	Elem.Text = Word+ {longest-match}

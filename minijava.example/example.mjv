@@ -1,1 +1,12 @@
-[a-z][a-zA-Z]*
+<catalogue>
+<book>
+ <title>Modern Compiler Implementation in ML</title>
+ <author>Andrew Appel</author>
+ <publisher>Cambridge</publisher>
+</book>
+<book>
+ <title>Parsing Schemata</title>
+ <author>Klaas Sikkel</author>
+ <publisher>Springer</publisher>
+</book>
+</catalogue>
