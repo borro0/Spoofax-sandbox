@@ -4,36 +4,12 @@ imports
   
   common
 
-lexical start-symbols
-
-  String Number
-  
-lexical syntax
-
-  String = "\"" StrChar "\""
-
-  StrChar = ~[\"\\]*
-  StrChar = "\\" [\"\\\/bfnrt]
-  StrChar = "\\u" [0-9A-F] [0-9A-F]
-	                [0-9A-F] [0-9A-F]
-
-  Number = "-"? ("0" | [1-9][0-9]*)
-	         ("." [0-9]*)?
-					 ([eE] [\+\-]? [0-9]+)?
-
 context-free start-symbols
   
-  Program Value
+  Program RE
 
 context-free syntax
   
-  Program.Program = <<Value+>>
-  Value.String = String
-  Value.Number = Number
-  Value.Object = "{" {NameValue ","}* "}"
-  Value.Array  = "[" {Value ","}* "]"
-  Value.True   = "true"
-  Value.False  = "false"
-  Value.null   = "null"
-
-  NameValue.NV = String ":" Value
+  Program.Program = <<RE+>>
+  RE.Str = STRING
+  RE.Plus = <<RE>*>
