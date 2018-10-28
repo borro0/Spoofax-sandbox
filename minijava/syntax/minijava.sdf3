@@ -15,13 +15,29 @@ context-free start-symbols
 
 context-free syntax
   
-  Program.Program = <<RE+>>
+  Program.Program = <<RE>>
   // RE.Wld =
   RE.Str = STRING
-  RE.CC = CC
+  RE.CC = CC						{non-assoc}
   // RE.EOL = NewLineEOF
-  RE.Seq = <<RE><RE>>
-  RE.Alt = <<RE>|<RE>>
-  RE.Plus = <<RE>+>
-  RE.Star = <<RE>*>
-  RE.Opt = <<RE>?>
+  RE.Seq = <<RE><RE>>		{non-assoc}
+  RE.Alt = <<RE>|<RE>>	{non-assoc}
+  RE.Plus = <<RE>+>			{right}
+  RE.Star = <<RE>*>			{right}
+  RE.Opt = <<RE>?>			{right}
+  RE = <( <RE> )> 			{bracket}
+  
+ context-free priorities
+
+	{ 
+		RE.CC
+  } > { right:
+    RE.Plus
+    RE.Star
+    RE.Opt
+  } > { 
+    RE.Alt 
+  } > {
+    RE.Seq
+  }
+    
