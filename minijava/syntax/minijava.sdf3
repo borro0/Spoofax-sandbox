@@ -1,27 +1,134 @@
 module minijava
 
 imports
-  
-  common
 
+  common
+  
 lexical syntax
 
-	CC = [\[] [a-zA-Z0-9]+ ([\-] [a-zA-Z0-9]+)* [\]]
-	CC = [\[\.\]]
+  // Rejedt using reserved keywords as identifier
+  ID = "abstract"		{reject}
+  ID = "assert"			{reject}
+  ID = "boolean"		{reject}
+  ID = "break"			{reject}
+  ID = "byte"			{reject}
+  ID = "case"			{reject}
+  ID = "catch"			{reject}
+  ID = "char"			{reject}
+  ID = "class"			{reject}
+  ID = "const"			{reject}
+  ID = "continue"		{reject}
+  ID = "default"		{reject}
+  ID = "do"				{reject}
+  ID = "double"			{reject}
+  ID = "else"			{reject}
+  ID = "enum"			{reject}
+  ID = "extends"		{reject}
+  ID = "final"			{reject}
+  ID = "finally"		{reject}
+  ID = "float"			{reject}
+  ID = "for"			{reject}
+  ID = "goto"			{reject}
+  ID = "if" 			{reject}
+  ID = "implements"		{reject}
+  ID = "import"			{reject}
+  ID = "instanceof" 	{reject}
+  ID = "int" 			{reject}
+  ID = "interface"		{reject}
+  ID = "long" 			{reject}
+  ID = "native"			{reject}
+  ID = "new"			{reject}
+  ID = "package"		{reject}
+  ID = "private"		{reject}
+  ID = "protected" 		{reject}
+  ID = "public"			{reject}
+  ID = "return"			{reject}
+  ID = "short" 			{reject}
+  ID = "static" 		{reject}
+  ID = "strictfp" 		{reject}
+  ID = "super"  		{reject}
+  ID = "switch" 		{reject}
+  ID = "synchronized" 	{reject}
+  ID = "this" 			{reject}
+  ID = "throw"  		{reject}
+  ID = "throws" 		{reject}
+  ID = "transient" 		{reject}
+  ID = "try" 			{reject}
+  ID = "void"  			{reject}
+  ID = "volatile" 		{reject}
+  ID = "while" 			{reject}
+  ID = "true" 			{reject}
+  ID = "false"  		{reject}
+  ID = "null"			{reject}			
   
+ 
+lexical start-symbols
+
+  INT ID
+
 context-free start-symbols
-  
-  Program RE CC
+
+  Exp Statement Type MethodDecl ParamDecl VarDecl ClassDecl MainClass Program
 
 context-free syntax
   
-  Program.Program = <<RE+>>
-  // RE.Wld =
-  RE.Str = STRING
-  RE.CC = CC
-  // RE.EOL = NewLineEOF
-  RE.Seq = <<RE><RE>>
-  RE.Alt = <<RE>|<RE>>
-  RE.Plus = <<RE>+>
-  RE.Star = <<RE>*>
-  RE.Opt = <<RE>?>
+  Exp.And = <<Exp> && <Exp>> {left}
+  Exp.Lt = <<Exp> \< <Exp>> {non-assoc}
+  Exp.Add = <<Exp> + <Exp>> {left}
+  Exp.Sub = <<Exp> - <Exp>> {left}
+  Exp.Mult = <<Exp> * <Exp>> {left}
+  
+  Exp.Array = <<Exp> [ <Exp> ]> {left}
+  Exp.Length = <<Exp>.length> {left}
+  Exp.Call = <<Exp> . <ID> ( <{Exp ","}*> )> {left}
+
+  Exp.Int = INT 
+  Exp.True = <true>
+  Exp.False = <false>
+  Exp.Id = ID
+  Exp.This = <this>
+  Exp.NewInt = <new int [ <Exp> ]>
+  Exp.NewId = <new <ID> ( )>
+  Exp.Neg = <! <Exp>> {right}
+  Exp = <( <Exp> )> {bracket}
+  
+  Statement.List = <{ <Statement*> }>
+  Statement.If = <if ( <Exp> ) <Statement> else <Statement>>
+  Statement.While = <while ( <Exp> ) <Statement>>
+  Statement.Print = <System.out.println ( <Exp> ) ;>
+  Statement.Assign = <<ID> = <Exp> ;>
+  Statement.ArrAssign = <<ID> [ <Exp> ] = <Exp> ;>
+  
+  Type.Arr = <int []>
+  Type.bool = <boolean>
+  Type.Int = <int>
+  Type.Id = ID
+  
+  MethodDecl.MethodDecl = <public <Type> <ID> ( <{ParamDecl ","}*> ) { <VarDecl*> <Statement*> return <Exp> ; }>
+  ParamDecl.ParamDecl = <<Type> <ID>>
+  VarDecl.VarDecl = <<Type> <ID> ;>
+  FieldDecl.FieldDecl = <<Type> <ID> ;>
+  ClassDecl.ClassDecl = <class <ID> { <FieldDecl*> <MethodDecl*> }>
+  ClassDecl.ClassDeclExtend = <class <ID> extends <ID> { <FieldDecl*> <MethodDecl*> }>
+  MainClass.MainClass = <class <ID> { public static void main ( String [] <ID> ) { <Statement*> } }>
+  Program.Program = <<MainClass> <ClassDecl*>>
+  
+ context-free priorities
+
+  { left:
+  	Exp.Array
+  	Exp.Length
+  	Exp.Call
+  } > { 
+  	Exp.Neg 
+  } > {
+	Exp.Mult
+  } > { left:
+  	Exp.Add
+    Exp.Sub
+  } > {
+    Exp.Lt
+  } > {
+    Exp.And
+  }
+  

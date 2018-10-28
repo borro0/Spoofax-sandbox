@@ -3,7 +3,6 @@ module minijava
 imports
 
   completion/completion
-  desugar
   pp
 
 rules // Debugging

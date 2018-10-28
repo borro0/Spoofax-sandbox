@@ -1,1 +1,16 @@
-[a-z][a-zA-Z]*
+class Factorial{
+    public static void main(String[] a){
+        variable = new int [10].ComputeFac(10);
+        variable = new int [ new int [ new int [10]]];
+    	result = variable.ComputeFac(10).hooi();
+    }
+}
+
+class foo { 
+	public int bar ( int text ) 
+	{
+		int a;
+		System.out.println(1);
+		return a;
+	}
+}

@@ -1,9 +1,0 @@
-module desugar
-
-imports
-
-  src-gen/signatures/common-sig
-  src-gen/signatures/minijava-sig
-  libspoofax/editor/outline
-  libspoofax/term/origin
-  pp

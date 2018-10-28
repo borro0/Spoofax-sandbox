@@ -1,0 +1,57 @@
+module example
+
+language minijava
+
+start symbol Statement
+
+test print 				[[System.out.println(1);]] parse succeeds
+test print string		[[System.out.println("hello world");]] parse fails
+test print no ;			[[System.out.println(1)]] parse fails
+test printf 			[[printf("test");]] parse fails
+
+test while 				[[while (true) foo = 3;]] parse succeeds
+
+test only if 			[[if (false) {foo = 3;}]] parse fails
+test if else			[[if (true) foo = 5; else foo = 3;]] parse succeeds
+
+test single func		[[foo();]] parse fails
+test single method		[[foo.bar();]] parse fails
+
+test return				[[return 2;]] parse fails
+
+test array access		[[foo[3] = 2;]] parse succeeds 
+test array access space [[foo [3] = 2;]] parse succeeds 
+
+// reject other commonly used operators of java
+test increment				[[bar++]] parse fails
+test decrement				[[bar--]] parse fails
+test assignment				[[var += 1]] parse fails
+test assignment2			[[var -= 1]] parse fails
+
+test multiple statements [[
+while (true) 
+{	
+	if (true) 	
+	{ 		
+		foo = 3;
+ 	}
+ 	else 
+ 	{ 
+ 		henk[2] = 4;
+ 	}
+ 	while (i < 5)
+ 	{
+ 		System.out.println(HelloWorld);
+ 		if (3 < 4)
+ 		{
+ 			foo[2] = array[i].length;
+ 		}
+ 		else
+ 		{
+ 			array = 2;
+ 			result = foo.bar(2);
+ 		}
+ 	}
+}
+]] parse succeeds
+		

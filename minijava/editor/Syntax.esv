@@ -20,4 +20,3 @@ menus
 
     action: "Format"          = editor-format (source)
     action: "Show parsed AST" = debug-show-aterm (source)
-    action: "Show desugared syntax" = editor-desugar (source)
