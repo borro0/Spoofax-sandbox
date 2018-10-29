@@ -9,8 +9,6 @@ context-free start-symbols
   Program
 
 context-free syntax
-  
-context-free syntax
   Program.S   = E
   E.Var = ID
   E.Neg = "-" E
@@ -18,20 +16,18 @@ context-free syntax
   E.Sub = E "-" E	{left}
   E.Div = E "/" E	{left}
   E.Mul = E "*" E	{left}
-  E.Pow = E "^" E	{right}
+  E.Pow = E "^" E	{left}
   E.Par = "(" E ")"
  
  context-free priorities
 
 	{ 
-		RE.CC
-  } > { right:
-    RE.Plus
-    RE.Star
-    RE.Opt
-  } > { 
-    RE.Alt 
-  } > {
-    RE.Seq
+		E.Pow
+  } > { left:
+    E.Mul
+    E.Div
+  } > { left:
+    E.Add
+    E.Sub 
   }
     
