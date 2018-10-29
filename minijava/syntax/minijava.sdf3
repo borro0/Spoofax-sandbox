@@ -11,7 +11,7 @@ context-free start-symbols
 context-free syntax
   Program.S   = E
   E.Var = ID
-  E.Neg = "-" E		{left}
+  E.Neg = "-" E
   E.Add = E "+" E	{left}
   E.Sub = E "-" E	{left}
   E.Div = E "/" E	{left}
@@ -23,12 +23,13 @@ context-free syntax
 
 	{ 
 		E.Pow
+	} > {
+		E.Neg
   } > { left:
     E.Mul
     E.Div
   } > { left:
     E.Add
     E.Sub
-    E.Neg
   }
     
