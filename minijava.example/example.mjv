@@ -1,1 +1,1 @@
-App(Fun(["x"], Var("x")), [Var("a")])
+App(Fun(["x", "y"], Var("x")), [Var("a"), Var("b")])

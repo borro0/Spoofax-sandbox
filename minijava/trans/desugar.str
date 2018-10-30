@@ -18,14 +18,6 @@ rules
 	desugar:
 		App(Fun([s1], body), [e1 ,e2 | e3]) -> App(App(Fun([s1], body),[e1]), [e2 | e3])  
 
-	desugar:
-		App(Fun([s1], body), [Var(s2)]) -> body'
-		where
-			body' := <topdown(param-subt)> body;
-		rules (
-		  param-subt: Var(s1) -> Var(s2)
-		)
-	
 strategies
 
   desugar-all = innermost(debug; desugar)
