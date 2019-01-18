@@ -4,5 +4,6 @@ name: minijava.example
 dependencies:
   compile:
   - nl.tudelft.cs4200:minijava:1.0.0-SNAPSHOT
+  - org.metaborg:jasmin:1.0.0-SNAPSHOT
 build:
   useBuildSystemSpec: true

@@ -4,15 +4,17 @@ name: minijava
 dependencies:
   compile:
   - org.metaborg:org.metaborg.meta.lang.esv:${metaborgVersion}
-  - org.metaborg:org.metaborg.meta.lang.template:${metaborgVersion}
+  - org.metaborg:jasmin:1.0.0-SNAPSHOT
   source:
   - org.metaborg:meta.lib.spoofax:${metaborgVersion}
-  - org.metaborg:org.metaborg.meta.lib.analysis:${metaborgVersion}
-pardonedLanguages:
-- EditorService
-- Stratego-Sugar
-- SDF
+  - org.metaborg:org.metaborg.meta.nabl2.shared:${metaborgVersion}
+  - org.metaborg:org.metaborg.meta.nabl2.runtime:${metaborgVersion}
+  - org.metaborg:jasmin:1.0.0-SNAPSHOT
+exports:
+  directory: reference
 language:
+  sdf:
+    completion-parse-table: "reference/sdf-completions.tbl"
   stratego:
     format: ctree
     args:

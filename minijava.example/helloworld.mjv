@@ -1,0 +1,19 @@
+class MethodVarsParams 
+{
+  public static void main(String[] args) 
+  {
+    System.out.println(new B().i(new int[2]));
+  }
+}
+
+class B
+{
+
+	public int i (int [] param3)
+	{
+	
+		param3[0] = 1;		
+
+		return param3[0];
+	}
+}

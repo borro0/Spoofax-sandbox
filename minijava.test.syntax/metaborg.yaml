@@ -1,9 +1,0 @@
----
-id: nl.tudelft.cs4200:minijava.test.syntax:1.0.0-SNAPSHOT
-name: minijava.test.syntax
-dependencies:
-  compile:
-  - nl.tudelft.cs4200:minijava:1.0.0-SNAPSHOT
-  - org.metaborg:org.metaborg.meta.lang.spt:${metaborgVersion}
-build:
-  useBuildSystemSpec: true

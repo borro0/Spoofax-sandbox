@@ -1,0 +1,189 @@
+module codegen/statements
+
+imports
+
+  reference/src-gen/signatures/-
+  reference/src-gen/nabl2/collection/analysis/minijava
+  nabl2/api
+  libspoofax/stratego/debug
+  codegen/-
+
+imports // Jasmin signatures
+
+  signatures/JasminXT-Annotations-sig
+  signatures/JasminXT-Arithmetic-sig
+  signatures/JasminXT-Control-sig
+  signatures/JasminXT-Conversion-sig
+  signatures/JasminXT-Descriptors-sig
+  signatures/JasminXT-Directives-sig
+  signatures/JasminXT-Exceptions-sig
+  signatures/JasminXT-Fields-sig
+  signatures/JasminXT-Header-sig
+  signatures/JasminXT-Instructions-sig
+  signatures/JasminXT-InvokeReturn-sig
+  signatures/JasminXT-LoadStore-sig
+  signatures/JasminXT-Methods-sig
+  signatures/JasminXT-Names-sig
+  signatures/JasminXT-Numbers-sig
+  signatures/JasminXT-Objects-sig
+  signatures/JasminXT-Stack-sig
+  signatures/JasminXT-Strings-sig
+  signatures/JasminXT-Synchronisation-sig
+  signatures/JasminXT-Types-sig
+  signatures/JasminXT-Whitespace-sig
+  signatures/jasmin-sig
+  reference/desugar-signatures
+  analysis
+
+rules
+
+	stmt-to-jbc:
+		ArrayAssign(VarRef(name), index, value) ->
+			<concat> [
+				[
+					ALOAD_0(),
+      		GETFIELD(JBCFieldRef(CRef(cname), FRef(name), JBCFieldDesc(type)))
+      	],
+      	<exp-to-jbc> index,
+      	<exp-to-jbc> value,
+      	[ IASTORE() ]
+      ]
+		
+	  where
+	    a            := <nabl2-get-ast-analysis>
+	  ; ref-occ      := <nabl2-mk-occurrence(|"Var")> name
+	  ; (dec-occ, _) := <nabl2-get-resolved-name(|a)> ref-occ
+	  ; origin       := <nabl2-get-property(|a, "origin")> dec-occ
+	  ; <?Field()> origin
+	  ; cname   		 := <nabl2-get-property(|a, "cname")> dec-occ
+	  ; type				 := <type-to-jbc> (<nabl2-get-type(|a)> dec-occ)
+
+	stmt-to-jbc:
+		ArrayAssign(VarRef(name), arr_index, value) ->
+			<concat> [
+				[	ALOAD(VarNum(var_index)) ],
+      	<exp-to-jbc> arr_index,
+      	<exp-to-jbc> value,
+      	[ IASTORE() ]
+      ]
+		
+	  with
+	    a            	:= <nabl2-get-ast-analysis>
+	  ; ref-occ      	:= <nabl2-mk-occurrence(|"Var")> name
+	  ; (dec-occ, _) 	:= <nabl2-get-resolved-name(|a)> ref-occ
+	  ; origin       	:= <nabl2-get-property(|a, "origin")> dec-occ
+	  ; <?Param() + ?Local()> origin
+	  ; type				 	:= <type-to-jbc> (<nabl2-get-type(|a)> dec-occ)
+	  ; var_index			:= <nabl2-get-property(|a, "index")> dec-occ
+	   	
+ 
+ 	stmt-to-jbc:
+ 		Assign(VarRef(name), value) -> // matches on Fields
+			<concat> [
+				[ ALOAD_0() ],
+				<exp-to-jbc> value,
+				[	PUTFIELD(JBCFieldRef(CRef(cname), FRef(name), JBCFieldDesc(type))) ]
+			]
+	  where
+	    a            := <nabl2-get-ast-analysis>
+	  ; ref-occ      := <nabl2-mk-occurrence(|"Var")> name
+	  ; (dec-occ, _) := <nabl2-get-resolved-name(|a)> ref-occ
+	  ; origin       := <nabl2-get-property(|a, "origin")> dec-occ
+	  ; <?Field()> origin
+	  ; cname   		 := <nabl2-get-property(|a, "cname")> dec-occ
+	  ; type				 := <type-to-jbc> (<nabl2-get-type(|a)> dec-occ)	  
+ 
+ 	stmt-to-jbc:
+ 		Assign(VarRef(name), value) -> // matches on Params/Locals Objects 
+ 			<concat> [
+ 				<exp-to-jbc> value,
+ 				[ASTORE(VarNum(index))] 		
+ 			]
+	  where
+	    a            := <nabl2-get-ast-analysis>
+	  ; ref-occ      := <nabl2-mk-occurrence(|"Var")> name
+	  ; (dec-occ, _) := <nabl2-get-resolved-name(|a)> ref-occ
+	  ; origin       := <nabl2-get-property(|a, "origin")> dec-occ
+	  ; <?Param() + ?Local()> origin
+	  ; type				 := <type-to-jbc> (<nabl2-get-type(|a)> dec-occ)	
+	  ; <?Reference(_)> type
+	  ; index					:= <nabl2-get-property(|a, "index")> dec-occ 	  
+ 
+ 	stmt-to-jbc:
+ 		Assign(VarRef(name), value) -> // matches on Params/Locals other than Objects 
+ 			<concat> [
+ 				<exp-to-jbc> value,
+ 				[ISTORE(VarNum(index))] 		
+ 			]
+	  with
+	    a            := <nabl2-get-ast-analysis>
+	  ; ref-occ      := <nabl2-mk-occurrence(|"Var")> name
+	  ; (dec-occ, _) := <nabl2-get-resolved-name(|a)> ref-occ
+	  ; origin       := <nabl2-get-property(|a, "origin")> dec-occ
+	  ; <?Param() + ?Local()> origin
+	  ; type				 := <type-to-jbc> (<nabl2-get-type(|a)> dec-occ)	
+	  ; not(<?Reference(_)> type)
+	  ; index					:= <nabl2-get-property(|a, "index")> dec-occ 
+ 
+  stmt-to-jbc:
+  	Print(expression) -> 
+  		<concat> [ 
+  			[
+  				GETSTATIC(
+          	JBCFieldRef(
+            	CRef("java/lang/System")
+          	, FRef("out")
+          	, JBCFieldDesc(Reference(CRef("java/io/PrintStream")))
+          	)
+        	)
+        ]
+        , jbc_constant_instructions
+        , [
+        	INVOKEVIRTUAL(
+	        	JBCMethodRef(
+	          	CRef("java/io/PrintStream")
+	          	, MRef("println")
+	          	, JBCMethodDesc([Int()], Void())
+	          )
+	        )
+	      ]
+      ]
+			where jbc_constant_instructions := <exp-to-jbc> expression
+	
+	stmt-to-jbc:
+		Block(statements) -> <concat> (<map(stmt-to-jbc)> statements)
+	
+	stmt-to-jbc:
+		If(condition, true_statement, false_statement) -> 
+			<concat> [
+					<exp-to-jbc> condition
+				, [IFEQ(LabelRef(false_label))]
+				, <stmt-to-jbc> true_statement
+				, [		
+		      GOTO(LabelRef(exit_label))
+		      , JBCLabel(false_label)
+		    ]
+		    , <stmt-to-jbc> false_statement
+		    , [JBCLabel(exit_label)] 
+			]
+			where false_label := <newname> "if_false"
+					; exit_label := <newname> "if_exit"
+	
+	stmt-to-jbc:
+		While(condition, statement) -> 
+			<concat> [
+				[ JBCLabel(while_label) ]
+				, <exp-to-jbc> condition
+				, [IFEQ(LabelRef(exit_label))]
+				, <stmt-to-jbc> statement
+				, [		
+		      GOTO(LabelRef(while_label))
+		      , JBCLabel(exit_label)
+		    ]
+			]
+			where while_label := <newname> "while"
+					; exit_label := <newname> "while_exit"
+				
+			
+		
+  

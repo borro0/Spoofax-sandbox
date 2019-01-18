@@ -8,20 +8,25 @@ build:
   only:
     - /^assignment-.*-develop$/
   script:
+    - git clone -b cs4200 https://github.com/MetaBorgCube/spoofax-jasmin.git
+    - cd spoofax-jasmin/jasmin
+    - echo "-Xmx1024M -Xms512M -Xss2M" > .mvn/jvm.config
+    - mvn -q install
+    - cd ../..
     - mvn verify
   cache:
     paths:
       - .m2/
   variables:
-    MAVEN_OPTS: "-Dmaven.repo.local=.m2"
+    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2"
 
 grade:
   image: gitlab.ewi.tudelft.nl:4242/cs4200-b/admin/docker-grader:latest
   stage: grade
   tags:
-    - longJob
+    - builder1
   only:
     - /^assignment-.*-submission$/
     - /^assignment-.*-grade$/
   script:
-    - /grading/run $CI_COMMIT_REF_NAME $CI_PROJECT_DIR
+    - /grading/run $CI_COMMIT_REF_NAME $CI_PROJECT_DIR/minijava

@@ -2,20 +2,10 @@ module minijava
 
 imports
 
-  completion/completion
-  desugar
+  reference/src-gen/completion/completion
+  reference/outline
   pp
-
-rules // Debugging
-
-	editor-desugar:
-	  (_, _, ast, path, project-path) -> (filename, text)
-	  where
-	    filename := <guarantee-extension(|"desugared.aterm")> path ;
-	    text     := <desugar-all> ast
-
-  debug-show-aterm:
-    (node, _, _, path, project-path) -> (filename, result)
-    with
-      filename := <guarantee-extension(|"aterm")> path
-    ; result   := node
+  analysis
+  jasmin
+  codegen/-
+  

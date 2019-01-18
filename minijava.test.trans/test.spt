@@ -1,0 +1,374 @@
+module test
+
+language minijava
+
+test compiler test [[
+  class Main {
+    public static void main(String[] args) {
+      System.out.println(42);
+    }
+  }
+]] run run-jc-trim to "42"
+
+test if test true [[
+class Lab09 {
+  public static void main(String[] args) {
+  	{
+  		if(true)
+  		{
+  			System.out.println(1);
+  		}
+  		else 
+  		{
+  			System.out.println(0);
+  		}
+  	}
+  }
+}
+]] run run-jc-trim to "1"
+
+test if test false [[
+class Lab09 {
+  public static void main(String[] args) {
+  	{
+  		if(false)
+  		{
+  			System.out.println(1);
+  		}
+  		else 
+  		{
+  			System.out.println(0);
+  		}
+  	}
+  }
+}
+]] run run-jc-trim to "0"
+
+test while false [[
+class Lab09 {
+  public static void main(String[] args) {
+  	{
+  		while(false) {
+  			System.out.println(1);
+  		}
+  		System.out.println(0);
+  	}
+  }
+}
+]] run run-jc-trim to "0"
+
+test new array length [[
+class Lab09 {
+  public static void main(String[] args) {
+  	{
+  		System.out.println(new int[300].length);
+  	}
+  }
+}
+]] run run-jc-trim to "300"
+
+test negation [[
+class Lab09 {
+  public static void main(String[] args) {
+  	{
+  		if(!false)
+  		{
+  			System.out.println(1);
+  		}
+  		else 
+  		{
+  			System.out.println(0);
+  		}
+  		if(!true)
+  		{
+  			System.out.println(0);
+  		}
+  		else 
+  		{
+  			System.out.println(1);
+  		}
+  	}
+  }
+}
+]] run run-jc-trim to "11"
+
+test AndOp [[
+class Lab09 {
+  public static void main(String[] args) {
+  	{
+  		if(false && false)
+  		{
+  			System.out.println(1);
+  		}
+  		else 
+  		{
+  			System.out.println(0);
+  		}
+  		
+  		if(true && false)
+  		{
+  			System.out.println(1);
+  		}
+  		else 
+  		{
+  			System.out.println(0);
+  		}
+  		
+  		if(false && true)
+  		{
+  			System.out.println(1);
+  		}
+  		else 
+  		{
+  			System.out.println(0);
+  		}
+  		
+  		if(true && true)
+  		{
+  			System.out.println(1);
+  		}
+  		else 
+  		{
+  			System.out.println(0);
+  		}
+  	}
+  }
+}
+]] run run-jc-trim to "0001"
+
+test basic math [[
+class Lab09 {
+  public static void main(String[] args) {
+  	{
+ 			System.out.println(12 + 23);
+ 			System.out.println(100-20);
+ 			System.out.println(10*5);
+ 			System.out.println(10+(7*(10-5)-5));
+  	}
+  }
+}
+]] run run-jc-trim to "35805040"
+
+test less then [[
+class Lab09 {
+  public static void main(String[] args) {
+  	{
+  		if(10 < 15)
+  		{
+  			System.out.println(1);	
+  		}
+  		else
+  		{
+  			System.out.println(0);
+  		}
+  		
+  		if(15 < 10)
+  		{
+  			System.out.println(1);	
+  		}
+  		else
+  		{
+  			System.out.println(0);
+  		}
+  	}
+  }
+}
+]] run run-jc-trim to "10"
+
+test object creation and call [[
+class helloworld {
+  public static void main(String[] args) {
+  	System.out.println(new D().i());
+  }
+}
+
+class D { 
+	public int i () {
+		System.out.println(10);
+		return new D().j();
+	}
+	
+	public int j () {
+		return 20;
+	}
+}
+]] run run-jc-trim to "1020"
+
+test extend [[
+class Lab10 {
+  public static void main(String[] args) {
+    System.out.println(new D().i());
+  }
+}
+
+class C { }
+
+class D extends C {
+  public int i() {
+    {
+      {
+        if(3 < 1)
+          System.out.println(new int[0].length);
+        else {
+          System.out.println(this.j());
+          System.out.println(new int[0].length);
+        }
+      }
+    }
+    return 21;
+  }
+  public int j() {
+    return (3 * 7) + 22 - 1;
+  }
+}
+]] run run-jc-trim to "42021"
+
+test simple field access and assignment [[
+class SimpleField 
+{
+  public static void main(String[] args) 
+  {
+    System.out.println(new A().i());
+  }
+}
+
+class A
+{
+	int field1;
+	int field2;
+
+	public int i ()
+	{
+		field1 = 2;
+		field2 = 3;
+	
+		return field1 + field2;
+	}
+}
+]] run run-jc-trim to "5"
+
+test array field access and assignment [[
+class SimpleField 
+{
+  public static void main(String[] args) 
+  {
+    System.out.println(new A().i());
+  }
+}
+
+class A
+{
+	int [] array_field;
+
+	public int i ()
+	{
+		array_field = new int [10];
+		
+		array_field[0] = 5;
+		array_field[1] = 7;
+	
+		return array_field[0] + array_field[1];
+	}
+}
+]] run run-jc-trim to "12"
+
+test object field access and assignment [[
+class ObjectField 
+{
+  public static void main(String[] args) 
+  {
+    System.out.println(new B().i());
+  }
+}
+
+class A
+{
+	public int i ()
+	{
+		return 42;
+	}
+}
+
+class B
+{
+	A a;
+
+	public int i ()
+	{
+		a = new A();
+		return a.i();
+	}
+}
+]] run run-jc-trim to "42"
+
+test params locals variables access and assignment[[
+class MethodVarsParams 
+{
+  public static void main(String[] args) 
+  {
+    System.out.println(new B().i(1, 2));
+  }
+}
+
+class A
+{
+	public int i ()
+	{
+		return 42;
+	}
+}
+
+class B
+{
+
+	public int i (int param1, int param2)
+	{
+	
+		int var1;
+		A a;
+		
+		var1 = 5;
+		a = new A();
+		
+
+		return a.i() + param1 + param2 + var1; // 42 + 1 + 2 + 5 = 50
+	}
+}
+]] run run-jc-trim to "50"
+
+test params locals array access and assignment[[
+class MethodVarsParams 
+{
+  public static void main(String[] args) 
+  {
+    System.out.println(new B().i(1, 2, new int[2]));
+  }
+}
+
+class A
+{
+	public int i ()
+	{
+		return 42;
+	}
+}
+
+class B
+{
+
+	public int i (int param1, int param2, int [] param3)
+	{
+	
+		int var1;
+		A a;
+
+		var1 = 5;
+		param3[0] = 1;
+		param3[1] = 2;
+		a = new A();
+		
+
+		return a.i() + param3[0] + param3[1] + var1; // 42 + 1 + 2 + 5 = 50
+	}
+}
+]] run run-jc-trim to "50"

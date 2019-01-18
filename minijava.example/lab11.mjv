@@ -1,0 +1,26 @@
+class Lab11 {
+  public static void main(String[] args) {
+    System.out.println(new D().i(new int[0], true));
+  }
+}
+
+class C {
+  D f;
+}
+
+class D extends C  {
+  public int i(int[] a, boolean b) {
+    C c;
+    {
+      c = this;
+      while (!b) {
+        if (a[0] < a.length && b)
+          c = f;
+        else
+          a[0] = 0;
+        b = false;
+      }
+    }
+    return (3 * 7) + 22 - 1;
+  }
+}

@@ -3,7 +3,9 @@ module Main
 imports
 
   Syntax
-
+  Analysis
+  Generation
+  
 language
 
   extensions : mjv

@@ -1,0 +1,10 @@
+---
+id: nl.tudelft.cs4200:minijava.test.trans:1.0.0-SNAPSHOT
+name: minijava.test.trans
+dependencies:
+  compile:
+  - nl.tudelft.cs4200:minijava:1.0.0-SNAPSHOT
+  - org.metaborg:jasmin:1.0.0-SNAPSHOT
+  - org.metaborg:org.metaborg.meta.lang.spt:${metaborgVersion}
+build:
+  useBuildSystemSpec: true

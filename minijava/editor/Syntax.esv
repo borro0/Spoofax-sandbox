@@ -3,12 +3,12 @@ module Syntax
 imports
 
   libspoofax/color/default
-  completion/colorer/minijava-cc-esv
+  reference/src-gen/completion/colorer/minijava-cc-esv
 
 language
 
-  table         : target/metaborg/sdf.tbl
-  start symbols : Program
+  table         : reference/sdf.tbl
+  start symbols : Start
 
   line comment  : "//"
   block comment : "/*" * "*/"
@@ -18,6 +18,11 @@ menus
 
   menu: "Syntax" (openeditor)
 
-    action: "Format"          = editor-format (source)
-    action: "Show parsed AST" = debug-show-aterm (source)
-    action: "Show desugared syntax" = editor-desugar (source)
+    action: "Format"             = editor-format (source)
+    action: "Show parsed AST"    = debug-show-aterm (source)
+    action: "Show desugared AST" = debug-show-aterm-desugar (source)
+
+views
+
+  outline view: editor-outline (source)
+    expand to level: 3

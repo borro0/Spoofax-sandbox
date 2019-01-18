@@ -3,10 +3,9 @@ module pp
 imports
 
   libstratego-gpp
-  libspoofax/sdf/pp
   libspoofax/editor/refactoring/-
-  pp/minijava-parenthesize
-  pp/minijava-pp
+  reference/src-gen/pp/minijava-parenthesize
+  reference/src-gen/pp/minijava-pp
 
 rules
 
@@ -30,12 +29,12 @@ rules
     ; prettyprint-minijava
     ; !V([], <id>)
     ; box2text-string(|120)
-
+    
   pp-partial-minijava-string(|sort) =
     parenthesize-minijava
     ; prettyprint-minijava(|sort)
     ; !V([], <id>)
-    ; box2text-string(|120)
+    ; box2text-string(|120)  
 
   pp-debug :
     ast -> result

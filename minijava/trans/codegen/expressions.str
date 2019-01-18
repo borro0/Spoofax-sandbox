@@ -1,0 +1,187 @@
+module codegen/expressions
+
+imports
+
+  reference/src-gen/signatures/-
+  reference/src-gen/nabl2/collection/analysis/minijava
+  nabl2/api
+  libspoofax/stratego/debug
+  codegen/-
+
+imports // Jasmin signatures
+
+  signatures/JasminXT-Annotations-sig
+  signatures/JasminXT-Arithmetic-sig
+  signatures/JasminXT-Control-sig
+  signatures/JasminXT-Conversion-sig
+  signatures/JasminXT-Descriptors-sig
+  signatures/JasminXT-Directives-sig
+  signatures/JasminXT-Exceptions-sig
+  signatures/JasminXT-Fields-sig
+  signatures/JasminXT-Header-sig
+  signatures/JasminXT-Instructions-sig
+  signatures/JasminXT-InvokeReturn-sig
+  signatures/JasminXT-LoadStore-sig
+  signatures/JasminXT-Methods-sig
+  signatures/JasminXT-Names-sig
+  signatures/JasminXT-Numbers-sig
+  signatures/JasminXT-Objects-sig
+  signatures/JasminXT-Stack-sig
+  signatures/JasminXT-Strings-sig
+  signatures/JasminXT-Synchronisation-sig
+  signatures/JasminXT-Types-sig
+  signatures/JasminXT-Whitespace-sig
+  signatures/jasmin-sig
+  reference/desugar-signatures
+  analysis
+
+rules
+
+	exp-to-jbc:
+	  VarRef(name) -> // matches on Fields
+			[
+				ALOAD_0(),
+      	GETFIELD(JBCFieldRef(CRef(cname), FRef(name), JBCFieldDesc(type)))
+			]
+	  where
+	    a            := <nabl2-get-ast-analysis>
+	  ; ref-occ      := <nabl2-mk-occurrence(|"Var")> name
+	  ; (dec-occ, _) := <nabl2-get-resolved-name(|a)> ref-occ
+	  ; origin       := <nabl2-get-property(|a, "origin")> dec-occ
+	  ; <?Field()> origin
+	  ; cname   		 := <nabl2-get-property(|a, "cname")> dec-occ
+	  ; type				 := <type-to-jbc> (<nabl2-get-type(|a)> dec-occ)
+	  
+	exp-to-jbc:
+	  VarRef(name) -> [ALOAD(VarNum(index))] // matches on Param/Local Objects/Arrays
+	  where
+	    a           	:= <nabl2-get-ast-analysis>
+	  ; ref-occ     	:= <nabl2-mk-occurrence(|"Var")> name
+	  ; (dec-occ, _)	:= <nabl2-get-resolved-name(|a)> ref-occ
+	  ; origin      	:= <nabl2-get-property(|a, "origin")> dec-occ
+	  ; <?Param() + ?Local()> origin
+	  ; index					:= <nabl2-get-property(|a, "index")> dec-occ
+	  ; type				 	:= <type-to-jbc> (<nabl2-get-type(|a)> dec-occ)
+	  ; <?Reference(_) + ?Array(Int())> type
+	  
+	exp-to-jbc:
+	  VarRef(name) -> [ILOAD(VarNum(index))] // matches on Param/Local other than Objects/Arrays
+	  with
+	    a           	:= <nabl2-get-ast-analysis>
+	  ; ref-occ     	:= <nabl2-mk-occurrence(|"Var")> name
+	  ; (dec-occ, _)	:= <nabl2-get-resolved-name(|a)> ref-occ
+	  ; origin      	:= <nabl2-get-property(|a, "origin")> dec-occ
+	  ; <?Param() + ?Local()> origin
+	  ; index					:= <nabl2-get-property(|a, "index")> dec-occ
+	  ; type				 	:= <type-to-jbc> (<nabl2-get-type(|a)> dec-occ)
+	  ; not(<?Reference(_) + ?Array(Int())> type)
+
+	exp-to-jbc:
+		IntValue(integer) -> [ LDC(Int(integer)) ]
+	
+	exp-to-jbc:
+		True() -> [ ICONST_1() ]
+		
+	exp-to-jbc:
+		False() -> [ ICONST_0() ]
+		
+	exp-to-jbc:
+		UnExp(op, e) -> <concat> [ jbc_e, jbc_op ]
+		where jbc_e := <exp-to-jbc> e
+				; jbc_op := <op-to-jbc> op
+				
+	op-to-jbc:
+		LengthOp() -> [ ARRAYLENGTH() ]
+		
+	op-to-jbc:
+		NewArrayOp() -> [ NEWARRAY(IntName()) ]
+		
+	op-to-jbc:
+		NotOp() -> [
+			ICONST_1(),
+			SWAP(),
+			ISUB()
+		]
+			
+	exp-to-jbc:
+		BinExp(op, e1, e2) -> <concat> [ jbc_e1, jbc_e2, jbc_op ]
+		where jbc_e1 := <exp-to-jbc> e1
+				; jbc_e2 := <exp-to-jbc> e2
+				; jbc_op := <op-to-jbc> op
+	
+	exp-to-jbc:
+		BinExp(AndOp(), e1, e2) -> 
+			<concat> [
+				<exp-to-jbc> e1,
+				[IFEQ(LabelRef(false_label))],
+				<exp-to-jbc> e2,
+				[
+					GOTO(LabelRef(exit_label)),
+					JBCLabel(false_label),
+					ICONST_0(),
+					JBCLabel(exit_label)
+				]
+			]
+			where false_label := <newname> "AndOp_false";
+						exit_label := <newname> "AndOp_exit"
+
+	op-to-jbc:
+		Plus() -> [ IADD() ]
+	
+	op-to-jbc:
+		Minus() -> [ ISUB() ]
+
+	op-to-jbc:
+		Times() -> [ IMUL() ]
+		
+	op-to-jbc:
+		LtOp() -> [
+			IF_ICMPLT(LabelRef(true_label)),
+			ICONST_0(),
+			GOTO(LabelRef(exit_label)),
+			JBCLabel(true_label),
+			ICONST_1(),
+			JBCLabel(exit_label)
+		]
+		where true_label := <newname> "LtOp_true";
+					exit_label := <newname> "LtOp_exit"
+			
+	op-to-jbc:
+		SubscriptOp() -> [ IALOAD() ]
+	
+	exp-to-jbc:
+		This() -> [ ALOAD_0() ]
+	
+	arguments-to-jbc:
+		argument -> jbc_type
+		with
+  		a					:= <nabl2-get-ast-analysis>
+		; jbc_type 	:= <type-to-jbc> (<nabl2-get-ast-type(|a)> argument)
+	
+	exp-to-jbc:
+	  Call(object, name, arguments) -> 
+	  	<concat> [
+	  		<exp-to-jbc> object,
+	  		<concat> (<map(exp-to-jbc)> arguments),
+	  		[INVOKEVIRTUAL(
+          JBCMethodRef(
+            CRef(cname),
+          	MRef(name),
+          	JBCMethodDesc(arg_types, Int())
+          )
+        )]
+       ]
+	  with
+	    a            	:= <nabl2-get-ast-analysis>
+	  ; ref-occ      	:= <nabl2-mk-occurrence(|"Method")> name
+	  ; (dec-occ, _) 	:= <nabl2-get-resolved-name(|a)> ref-occ
+	  ; cname   		 	:= <nabl2-get-property(|a, "cname")> dec-occ
+	  ; arg_types			:= <map(arguments-to-jbc)> arguments
+	  
+	exp-to-jbc:
+		NewObject(name) -> 
+			[
+				NEW(CRef(name)),
+				DUP(),
+				INVOKESPECIAL(JBCMethodRef(CRef(name), MRef(Init()), JBCMethodDesc([], Void())))
+			]

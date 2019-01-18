@@ -1,0 +1,163 @@
+module codegen/classes
+
+imports
+
+  reference/src-gen/signatures/-
+  reference/src-gen/nabl2/collection/analysis/minijava
+  nabl2/api
+  libspoofax/stratego/debug
+  codegen/-
+
+imports // Jasmin signatures
+
+  signatures/JasminXT-Annotations-sig
+  signatures/JasminXT-Arithmetic-sig
+  signatures/JasminXT-Control-sig
+  signatures/JasminXT-Conversion-sig
+  signatures/JasminXT-Descriptors-sig
+  signatures/JasminXT-Directives-sig
+  signatures/JasminXT-Exceptions-sig
+  signatures/JasminXT-Fields-sig
+  signatures/JasminXT-Header-sig
+  signatures/JasminXT-Instructions-sig
+  signatures/JasminXT-InvokeReturn-sig
+  signatures/JasminXT-LoadStore-sig
+  signatures/JasminXT-Methods-sig
+  signatures/JasminXT-Names-sig
+  signatures/JasminXT-Numbers-sig
+  signatures/JasminXT-Objects-sig
+  signatures/JasminXT-Stack-sig
+  signatures/JasminXT-Strings-sig
+  signatures/JasminXT-Synchronisation-sig
+  signatures/JasminXT-Types-sig
+  signatures/JasminXT-Whitespace-sig
+  signatures/jasmin-sig
+  reference/desugar-signatures
+  analysis
+
+rules
+
+  program-to-jbc:
+  	Program(main_class, class_list) -> [jbc_main_class | jbc_class_list]
+  	with jbc_main_class := <class-to-jbc> main_class
+  		 ; jbc_class_list := <map(class-to-jbc)> class_list
+  		 
+  type-to-jbc:
+		Int() -> Int()
+		
+	type-to-jbc:
+		IntArray() -> Array(Int())
+		
+	type-to-jbc:
+		Bool() -> Boolean()
+		
+	type-to-jbc:
+		ClassType(occurence) -> Reference(CRef(name))
+		with 
+			name := <nabl2-get-occurrence-name> occurence
+  		 
+  field-to-jbc:
+  	Field(type, name) -> JBCField([PRIVATE()], name, JBCFieldDesc(jbc_type), None(), None())
+  	with 
+  		a					:= <nabl2-get-ast-analysis>
+  	; jbc_type 	:= <type-to-jbc> (<nabl2-get-ast-type(|a)> type)
+  	  		
+  class-to-jbc:
+  	MainClass(class_name, arg_name, statement) -> JBCFile(header, lfield, lmethod)
+  	with header := 
+  					JBCHeader(
+  						None()
+  						, None()
+  						,	JBCClass([PUBLIC()], class_name)
+  						, JBCSuper("java/lang/Object")
+  						, []
+  						, None()
+  						, None()
+  						, []
+  						, []
+  						, []
+  					)
+  		 ; lfield := []
+  		 ; lmethod := 
+  		 			[ 
+	  		 			JBCMethod(
+					      [PUBLIC()]
+					    , Init()
+					    , JBCMethodDesc([], Void())
+					    , [ ALOAD(VarNum("0"))
+					      , INVOKESPECIAL(
+					          JBCMethodRef(CRef("java/lang/Object"), MRef(Init()), JBCMethodDesc([], Void()))
+					        )
+					      , RETURN()
+					      ]
+					    ),
+	  		 			JBCMethod(
+	  		 				[PUBLIC(), STATIC()]
+	  		 				, "main"
+	  		 				, JBCMethodDesc([Array(Reference(CRef("java/lang/String")))], Void())
+	  		 				, <concat> [[JBCLimitStack("100")], <stmt-to-jbc> statement, [RETURN()]]
+	  		 			)
+  		 			]
+  	
+  class-to-jbc:
+  	Class(name, None(), fields, methods) -> jbc
+  	with jbc := <class-to-jbc> Class(name, Parent("java/lang/Object"), fields, methods)	
+  	 			
+ 	class-to-jbc:
+ 		Class(name, Parent(parent), fields, methods) -> jbc
+ 			with jbc :=
+			JBCFile(
+			  JBCHeader(
+			    None()
+			  , None()
+			  , JBCClass([PUBLIC()], name)
+			  , JBCSuper(parent)
+			  , []
+			  , None()
+			  , None()
+			  , []
+			  , []
+			  , []
+			  )
+			, <map(field-to-jbc)> fields
+			, <concat> [
+					[JBCMethod(
+			      [PUBLIC()]
+			    , Init()
+			    , JBCMethodDesc([], Void())
+			    , [ ALOAD(VarNum("0"))
+			      , INVOKESPECIAL(
+			          JBCMethodRef(CRef(parent), MRef(Init()), JBCMethodDesc([], Void()))
+			        )
+			      , RETURN()
+			      ]
+			    )],
+			    <map(method-to-jbc)> methods 
+			  ]
+			)
+	
+	param-to-jbc:
+		Bind(index, Param(type, name)) -> jbc_type
+			with jbc_type := <type-to-jbc> type 
+ 			
+	method-to-jbc:
+	  Method(type, name, params, vardecls, statements, return_expression) -> 
+		  JBCMethod(
+	      [PUBLIC()], 
+	      name, 
+	      JBCMethodDesc(jbc_params, Int()), 
+	      <concat> [ 
+		    	[ 
+		    		JBCLimitStack("100"),
+		    		JBCLimitLocals("100")
+		    	],
+		    	<concat> <map(stmt-to-jbc)> statements,
+		    	<exp-to-jbc> return_expression,
+		      [ IRETURN() ]
+	      ]
+	    ) 
+	  with
+	    a       		:= <nabl2-get-ast-analysis>
+	  ; dec-occ 		:= <nabl2-mk-occurrence(|"Method")> name
+	  ; cname   		:= <nabl2-get-property(|a, "cname")> dec-occ
+	  ; jbc_params	:= <map(param-to-jbc)> params

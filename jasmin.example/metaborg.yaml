@@ -1,0 +1,8 @@
+---
+id: nl.tudelft.cs4200:jasmin.example:1.0.0-SNAPSHOT
+name: jasmin.example
+dependencies:
+  compile:
+  - org.metaborg:jasmin:1.0.0-SNAPSHOT
+build:
+  useBuildSystemSpec: true
